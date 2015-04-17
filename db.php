@@ -20,17 +20,28 @@ class DBVALUELIST{
     function pushRaw($str){
         $tmp = split("%",str_replace("\n","",$str));
         if($tmp[0]!=NULL){
-            $this->list[$tmp[0]] = array($tmp[1]?$tmp[1]:0,$tmp[2]?$tmp[2]:0);
+            $this->list[$tmp[0]] = array($tmp[1]?$tmp[1]:0,$tmp[2]?$tmp[2]:0,$tmp[3]?$tmp[3]:NULL);
         }
     }
     function pushValue($key,$type){
+        $key = str_replace("_"," ",$key);
         if(!empty($this->list[$key]))
             $this -> list[$key][$type?0:1] = $this -> list[$key][$type?0:1] + 1;
     }
 }
+$id = empty($id)?"none":$id;
+$countListFileName = "count.$id.db";
+$votedListFileName = "voted.$id.db";
 $votableListFile = fopen("votable.db","r");
-$votedListFile = fopen("voted.db","r");
-$countListFile = fopen("count.db","r");
+if(!file_exists($votedListFileName) && file_exists($countListFileName)){
+    $votedListFile = fopen($votedListFileName,"w+");
+    fclose($votedListFile);//touch votedListFile
+}
+$votedListFile = fopen($votedListFileName,"r");
+$idNotFound = !file_exists($countListFileName) || !file_exists($votedListFileName);
+if($idNotFound == FALSE){
+    $countListFile = fopen($countListFileName,"r");
+}
 $db_votableList = new DBLIST;
 $db_votedList = new DBLIST;
 $db_countList = new DBVALUELIST;
